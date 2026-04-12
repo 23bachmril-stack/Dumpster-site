@@ -222,18 +222,11 @@
     async function handleLogin() {
         const email = document.getElementById('auth-email').value;
         const password = document.getElementById('auth-password').value;
-
         const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-
         if (error) return alert(error.message);
 
-        // Check user role in profiles table
-        const { data: profile } = await _supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.user.id)
-            .single();
-
+        // Redirect based on role
+        const { data: profile } = await _supabase.from('profiles').select('role').eq('id', data.user.id).single();
         if (profile && profile.role === 'admin') {
             window.location.href = 'admin.html'; 
         } else {
@@ -253,7 +246,6 @@
     function validate() {
         let ok = false;
         const btn = document.getElementById('nextBtn');
-        
         if(currentStep === 1) ok = document.getElementById('cust_first').value.trim() !== "" && document.getElementById('cust_last').value.trim() !== "";
         else if(currentStep === 2) ok = document.getElementById('cust_email').value.includes('@');
         else if(currentStep === 3) ok = document.getElementById('cust_phone').value.trim() !== "";
@@ -302,42 +294,43 @@
         btn.innerText = "UPLOADING...";
         btn.disabled = true;
 
-        const idFile = document.getElementById('order_id').files[0];
-        let photoUrl = "";
+        try {
+            const idFile = document.getElementById('order_id').files[0];
+            let photoUrl = "";
 
-        if (idFile) {
-            const fileExt = idFile.name.split('.').pop();
-            const fileName = `${Date.now()}.${fileExt}`;
-            
-            const { data: uploadData, error: uploadError } = await _supabase.storage
-                .from('orders-ids') 
-                .upload(fileName, idFile);
-
-            if (uploadError) {
-                alert("Upload Error: " + uploadError.message);
-                btn.innerText = "Try Again";
-                btn.disabled = false;
-                return;
+            if (idFile) {
+                const fileName = `${Date.now()}.${idFile.name.split('.').pop()}`;
+                const { data: uploadData, error: uploadError } = await _supabase.storage.from('orders-ids').upload(fileName, idFile);
+                if (uploadError) throw new Error("Photo Error: " + uploadError.message);
+                const { data: urlData } = _supabase.storage.from('orders-ids').getPublicUrl(fileName);
+                photoUrl = urlData.publicUrl;
             }
-            
-            const { data: urlData } = _supabase.storage.from('orders-ids').getPublicUrl(fileName);
-            photoUrl = urlData.publicUrl;
-        }
 
-        formData.customer_name = document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value;
-        formData.email = document.getElementById('cust_email').value;
-        formData.delivery_address = document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value + " " + document.getElementById('addr_state').value;
-        formData.id_photo_url = photoUrl;
+            const finalData = {
+                customer_name: document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value,
+                Emil: document.getElementById('cust_email').value,
+                phone: document.getElementById('cust_phone').value,
+                address: document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value + " " + document.getElementById('addr_state').value,
+                dumpster_size: formData.container || '',
+                waste_type: formData.dispose || '',
+                delivery_date: document.getElementById('order_date').value,
+                delivery_time: document.getElementById('order_time').value || '',
+                instructions: document.getElementById('order_comments').value || '',
+                id_photo_url: photoUrl,
+                status: 'New Order',
+                invoice_number: '',
+                total_paid: 0
+            };
 
-        const { error: dbError } = await _supabase.from('dumpster_orders').insert([formData]);
+            const { error: dbError } = await _supabase.from('dumpster_orders').insert([finalData]);
+            if(dbError) throw new Error("Database Error: " + dbError.message);
 
-        if(dbError) {
-            alert("Database Error: " + dbError.message);
-            btn.disabled = false;
-            btn.innerText = "Submit Final Order";
-        } else {
             alert("Success! Order submitted.");
             location.reload();
+        } catch (err) {
+            alert(err.message);
+            btn.disabled = false;
+            btn.innerText = "Submit Final Order";
         }
     }
 </script>
