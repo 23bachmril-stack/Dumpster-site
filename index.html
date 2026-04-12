@@ -202,6 +202,15 @@
     let currentStep = 1;
     let formData = { status: 'New Order' };
 
+    async function checkUser() {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (user) {
+            document.getElementById('user-display').innerText = `Logout (${user.email.split('@')[0]})`;
+            document.getElementById('user-display').onclick = () => { _supabase.auth.signOut().then(()=>location.reload()); };
+        }
+    }
+    checkUser();
+
     function openLoginModal() { document.getElementById('login-modal').style.display='flex'; }
     function closeLoginModal() { document.getElementById('login-modal').style.display='none'; }
     function openSurvey() { document.getElementById('survey-modal').style.display='flex'; validate(); }
@@ -223,26 +232,22 @@
         if(error) alert(error.message); else alert("Account Created! Check email for confirmation.");
     }
 
-    async function checkUser() {
-        const { data: { user } } = await _supabase.auth.getUser();
-        if (user) {
-            document.getElementById('user-display').innerText = `Logout (${user.email.split('@')[0]})`;
-            document.getElementById('user-display').onclick = () => { _supabase.auth.signOut().then(()=>location.reload()); };
-        }
-    }
-    checkUser();
-
     function validate() {
         let ok = false;
-        if(currentStep === 1) ok = document.getElementById('cust_first').value && document.getElementById('cust_last').value;
-        else if(currentStep === 2) ok = document.getElementById('cust_email').value;
-        else if(currentStep === 3) ok = document.getElementById('cust_phone').value;
-        else if(currentStep === 4) ok = document.getElementById('addr_street').value;
+        const btn = document.getElementById('nextBtn');
+        
+        if(currentStep === 1) ok = document.getElementById('cust_first').value.trim() !== "" && document.getElementById('cust_last').value.trim() !== "";
+        else if(currentStep === 2) ok = document.getElementById('cust_email').value.includes('@');
+        else if(currentStep === 3) ok = document.getElementById('cust_phone').value.trim() !== "";
+        else if(currentStep === 4) ok = document.getElementById('addr_street').value.trim() !== "";
         else if(currentStep === 5) ok = !!formData.dispose;
+        else if(currentStep === 7) ok = document.getElementById('order_date').value !== "";
         else if(currentStep === 8) ok = !!formData.container;
         else if(currentStep === 11) ok = document.getElementById('order_id').files.length > 0;
         else ok = true;
-        document.getElementById('nextBtn').disabled = !ok;
+
+        btn.disabled = !ok;
+        btn.style.opacity = ok ? "1" : "0.5";
     }
 
     function highlightBubble(step, field, val) {
@@ -275,11 +280,47 @@
 
     async function submitFinalOrder(e) {
         e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.innerText = "UPLOADING...";
+        btn.disabled = true;
+
+        const idFile = document.getElementById('order_id').files[0];
+        let photoUrl = "";
+
+        if (idFile) {
+            const fileExt = idFile.name.split('.').pop();
+            const fileName = `${Date.now()}.${fileExt}`;
+            
+            // Logic targeting your specific bucket name
+            const { data: uploadData, error: uploadError } = await _supabase.storage
+                .from('orders-ids') 
+                .upload(fileName, idFile);
+
+            if (uploadError) {
+                alert("Upload Error: " + uploadError.message);
+                btn.innerText = "Try Again";
+                btn.disabled = false;
+                return;
+            }
+            
+            const { data: urlData } = _supabase.storage.from('orders-ids').getPublicUrl(fileName);
+            photoUrl = urlData.publicUrl;
+        }
+
         formData.customer_name = document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value;
         formData.email = document.getElementById('cust_email').value;
         formData.delivery_address = document.getElementById('addr_street').value;
-        const { error } = await _supabase.from('dumpster_orders').insert([formData]);
-        if(error) alert(error.message); else { alert("Confirmed!"); location.reload(); }
+        formData.id_photo_url = photoUrl;
+
+        const { error: dbError } = await _supabase.from('dumpster_orders').insert([formData]);
+
+        if(dbError) {
+            alert("Database Error: " + dbError.message);
+            btn.disabled = false;
+        } else {
+            alert("Success! Order submitted.");
+            location.reload();
+        }
     }
 </script>
 </body>
