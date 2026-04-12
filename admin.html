@@ -2,70 +2,130 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Holley Dispatch | Employee Portal</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --turq: #40E0D0; --dark: #111; }
-        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; border-left: 5px solid var(--turq); }
-        .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 10px; text-align: center; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
-        .btn { background: var(--turq); color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; width: 100%; }
-        #dashboard { display: none; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--turq); padding-bottom: 15px; margin-bottom: 30px; }
+        
+        /* Dashboard Styling */
+        .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .order-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid var(--turq); position: relative; }
+        .status-tag { position: absolute; top: 15px; right: 15px; background: #eee; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        
+        h3 { margin-top: 0; color: #333; font-size: 1.4rem; padding-right: 60px; }
+        .detail { margin: 8px 0; font-size: 0.95rem; color: #555; display: flex; align-items: flex-start; gap: 8px; }
+        .label { font-weight: bold; color: var(--dark); min-width: 80px; }
+        
+        .action-btns { display: flex; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
+        .btn-sm { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-deliver { background: var(--turq); color: white; }
+        .btn-pickup { background: #333; color: white; }
+
+        /* Login Screen */
+        #auth-gate { max-width: 400px; margin: 100px auto; background: white; padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 6px; box-sizing: border-box; }
+        #dashboard-ui { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen" class="login-box">
-        <h2 style="color:var(--turq)">EMPLOYEE LOGIN</h2>
+<div class="container">
+    <div id="auth-gate">
+        <h2 style="color:var(--turq)">ADMIN ACCESS</h2>
+        <p>Enter employee credentials</p>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="pass" placeholder="Password">
-        <button class="btn" onclick="login()">Login to Dispatch</button>
+        <button onclick="handleLogin()" style="background:var(--turq); color:white; border:none; width:100%; padding:15px; border-radius:6px; font-weight:bold; cursor:pointer;">SIGN IN</button>
     </div>
 
-    <div id="dashboard">
-        <h1>Active Orders</h1>
-        <div id="order-list">Loading orders...</div>
+    <div id="dashboard-ui">
+        <div class="header">
+            <div>
+                <h1 style="margin:0">Dispatch Board</h1>
+                <p style="margin:5px 0 0 0; color:#666;" id="admin-welcome">Welcome back, Admin</p>
+            </div>
+            <button onclick="logout()" style="background:none; border:2px solid #ff4444; color:#ff4444; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">LOGOUT</button>
+        </div>
+
+        <div class="order-grid" id="orders-container">
+            </div>
     </div>
+</div>
 
 <script>
     const SB_URL = 'https://RequestsService.supabase.co';
     const SB_KEY = 'sb_publishable_JS5YNr2g_rQJ5LGXeV8xmw_HOedqeXd';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-    async function login() {
+    async function handleLogin() {
         const e = document.getElementById('email').value;
         const p = document.getElementById('pass').value;
         const { data, error } = await _supabase.auth.signInWithPassword({ email: e, password: p });
         
-        if (error) alert(error.message);
-        else checkAdmin(data.user.id);
-    }
-
-    async function checkAdmin(uid) {
-        const { data } = await _supabase.from('profiles').select('role').eq('id', uid).single();
-        if (data?.role === 'admin') {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            fetchOrders();
+        if (error) {
+            alert("Login Failed: " + error.message);
         } else {
-            alert("Access Denied: You are not an admin.");
-            _supabase.auth.signOut();
+            checkAccess(data.user.id);
         }
     }
 
-    async function fetchOrders() {
-        const { data } = await _supabase.from('dumpster_orders').select('*').order('created_at', { ascending: false });
-        const list = document.getElementById('order-list');
-        list.innerHTML = data.map(o => `
-            <div class="card">
-                <h3>${o.customer_name}</h3>
-                <p>📍 ${o.delivery_address}</p>
-                <p>🏗️ Size: ${o.container}</p>
-                <p>📅 ${o.order_date} at ${o.order_time}</p>
-                <button onclick="updateStatus('${o.id}')" style="background:#333; color:white; border:none; padding:5px 10px; cursor:pointer;">Mark Delivered</button>
+    async function checkAccess(uid) {
+        const { data } = await _supabase.from('profiles').select('role').eq('id', uid).single();
+        if (data && data.role === 'admin') {
+            document.getElementById('auth-gate').style.display = 'none';
+            document.getElementById('dashboard-ui').style.display = 'block';
+            loadOrders();
+        } else {
+            alert("Unauthorized. This page is for employees only.");
+            await _supabase.auth.signOut();
+        }
+    }
+
+    async function loadOrders() {
+        const { data, error } = await _supabase.from('dumpster_orders').select('*').order('created_at', { ascending: false });
+        const container = document.getElementById('orders-container');
+        
+        if (data.length === 0) {
+            container.innerHTML = "<h3>No current orders found.</h3>";
+            return;
+        }
+
+        container.innerHTML = data.map(order => `
+            <div class="order-card">
+                <span class="status-tag" style="color:${getStatusColor(order.status)}">${order.status || 'NEW'}</span>
+                <h3>${order.customer_name}</h3>
+                <div class="detail"><span class="label">📍 Location:</span> ${order.delivery_address}</div>
+                <div class="detail"><span class="label">🏗️ Container:</span> ${order.container}</div>
+                <div class="detail"><span class="label">📅 Date:</span> ${order.order_date}</div>
+                <div class="detail"><span class="label">⏰ Time:</span> ${order.order_time}</div>
+                <div class="detail"><span class="label">📞 Phone:</span> ${order.cust_phone || 'Not Provided'}</div>
+                
+                <div class="action-btns">
+                    <button class="btn-sm btn-deliver" onclick="setStatus('${order.id}', 'Delivered')">Set Delivered</button>
+                    <button class="btn-sm btn-pickup" onclick="setStatus('${order.id}', 'Picked Up')">Set Picked Up</button>
+                </div>
             </div>
         `).join('');
+    }
+
+    function getStatusColor(s) {
+        if(s === 'Delivered') return '#2ecc71';
+        if(s === 'Picked Up') return '#3498db';
+        return '#f39c12';
+    }
+
+    async function setStatus(id, newStatus) {
+        const { error } = await _supabase.from('dumpster_orders').update({ status: newStatus }).eq('id', id);
+        if(!error) loadOrders();
+    }
+
+    async function logout() {
+        await _supabase.auth.signOut();
+        location.reload();
     }
 </script>
 </body>
