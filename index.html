@@ -225,7 +225,6 @@
         const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
         if (error) return alert(error.message);
 
-        // Redirect based on role
         const { data: profile } = await _supabase.from('profiles').select('role').eq('id', data.user.id).single();
         if (profile && profile.role === 'admin') {
             window.location.href = 'admin.html'; 
@@ -306,11 +305,12 @@
                 photoUrl = urlData.publicUrl;
             }
 
+            // Syncing with your actual column names from the screenshot
             const finalData = {
                 customer_name: document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value,
-                Emil: document.getElementById('cust_email').value,
+                email: document.getElementById('cust_email').value,
                 phone: document.getElementById('cust_phone').value,
-                address: document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value + " " + document.getElementById('addr_state').value,
+                address: document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value + " " + document.getElementById('addr_state').value + " " + document.getElementById('addr_zip').value,
                 dumpster_size: formData.container || '',
                 waste_type: formData.dispose || '',
                 delivery_date: document.getElementById('order_date').value,
