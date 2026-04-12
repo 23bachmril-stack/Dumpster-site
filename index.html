@@ -292,7 +292,7 @@
     }
 
     async function submitFinalOrder() {
-        alert("Processing order and securing photo... please wait.");
+        alert("Finalizing order... this may take 10 seconds due to the photo size.");
         const btn = document.getElementById('finalSubmitBtn');
         btn.innerText = "UPLOADING...";
         btn.disabled = true;
@@ -302,7 +302,6 @@
             let photoDataText = "";
 
             if (idFile) {
-                // Resize and compress the image to prevent "Load failed" timeouts
                 photoDataText = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.readAsDataURL(idFile);
@@ -311,13 +310,13 @@
                         img.src = event.target.result;
                         img.onload = () => {
                             const canvas = document.createElement('canvas');
-                            const MAX_WIDTH = 800; 
+                            const MAX_WIDTH = 600; 
                             const scaleSize = MAX_WIDTH / img.width;
                             canvas.width = MAX_WIDTH;
                             canvas.height = img.height * scaleSize;
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                            resolve(canvas.toDataURL('image/jpeg', 0.6)); 
                         };
                     };
                 });
@@ -339,13 +338,26 @@
                 total_paid: 0
             };
 
-            const { error: dbError } = await _supabase.from('dumpster_orders').insert([finalData]);
-            if(dbError) throw new Error("Database Error: " + dbError.message);
+            const response = await fetch(`${SB_URL}/rest/v1/dumpster_orders`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SB_KEY,
+                    'Authorization': `Bearer ${SB_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(finalData)
+            });
 
-            alert("Success! Order submitted.");
+            if (!response.ok) {
+                const errBody = await response.json();
+                throw new Error(errBody.message || "Database rejected the photo.");
+            }
+
+            alert("✅ Success! Your order has been placed.");
             location.reload();
         } catch (err) {
-            alert("ERROR: " + err.message);
+            alert("UPLOAD ERROR: " + err.message + "\n\nTip: If it keeps failing, try a screenshot of your ID instead of a photo.");
             btn.disabled = false;
             btn.innerText = "Submit Final Order";
         }
