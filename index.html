@@ -292,7 +292,7 @@
     }
 
     async function submitFinalOrder() {
-        alert("Processing order... please wait.");
+        alert("Starting secure upload... please wait.");
         const btn = document.getElementById('finalSubmitBtn');
         btn.innerText = "UPLOADING...";
         btn.disabled = true;
@@ -302,13 +302,20 @@
             let photoUrl = "";
 
             if (idFile) {
-                // FIXED: Using ArrayBuffer for mobile compatibility
-                const fileData = await idFile.arrayBuffer();
+                // Turn photo into text string (Base64) to bypass browser transfer blocks
+                const reader = new FileReader();
+                const photoData = await new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(idFile);
+                });
+
                 const fileName = `${Date.now()}-${idFile.name.replace(/\s/g, '_')}`;
                 
+                // Upload as a Base64 decoded Uint8Array
                 const { data: uploadData, error: uploadError } = await _supabase.storage
-                    .from('orders-ids') 
-                    .upload(fileName, fileData, {
+                    .from('orders-ids')
+                    .upload(fileName, Uint8Array.from(atob(photoData), c => c.charCodeAt(0)), {
                         contentType: idFile.type,
                         upsert: true
                     });
@@ -341,7 +348,7 @@
             alert("Success! Order submitted.");
             location.reload();
         } catch (err) {
-            alert("CRITICAL ERROR: " + err.message);
+            alert("UPLOAD BLOCKED: " + err.message);
             btn.disabled = false;
             btn.innerText = "Submit Final Order";
         }
