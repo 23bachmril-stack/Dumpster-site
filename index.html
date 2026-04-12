@@ -161,7 +161,6 @@
                     <div class="legal-title">CONTAINER DAMAGE AND THEFT RESPONSIBILITY</div>
                     I understand that I am responsible for the care and security of the dumpster while it is on-site. I agree to be liable for any damage to, or theft of, the container during the service period, excluding normal wear and tear. I accept responsibility for the cost of repair or replacement as determined by the company. By accepting service, I acknowledge and agree to these terms and accept full responsibility for the condition and security of the equipment while it is in my possession.
                 </div>
-                <button type="button" class="btn" style="width:100%" onclick="nextStep()">I Acknowledged</button>
             </div>
 
             <div class="survey-step" id="step13">
@@ -169,7 +168,6 @@
                     <div class="legal-title">SERVICE RISK</div>
                     I acknowledge that roll-off containers and delivery trucks are extremely heavy and may cause damage to driveways, pavement, underground utilities, and surrounding property. I accept full responsibility for any such damage that may occur during normal delivery, placement, service, or removal. I agree to release and hold the company harmless from any related liability or claims.
                 </div>
-                <button type="button" class="btn" style="width:100%" onclick="nextStep()">I Acknowledged</button>
             </div>
 
             <div class="survey-step" id="step14">
@@ -177,7 +175,6 @@
                     <div class="legal-title">WEIGHT, PROHIBITED MATERIALS & ADDITIONAL FEES</div>
                     I understand that contents placed in the dumpster are disposed of based on weight. I agree that any load exceeding the advertised weight limit will incur additional disposal charges at a rate of $0.06 per pound. I understand that certain materials are strictly prohibited and may not be placed in the dumpster, including but not limited to hazardous materials such as liquid paints, chemicals, medical waste, and batteries. I agree that additional charges will apply if the following items are placed in the dumpster: tires ($15 each), TVs/monitors ($25 each), and mattresses ($45 each). By using this service, I acknowledge that I will comply with these restrictions and accept all applicable charges.
                 </div>
-                <button type="button" class="btn" style="width:100%" onclick="nextStep()">I Acknowledged</button>
             </div>
 
             <div class="survey-step" id="step15">
@@ -251,9 +248,11 @@
         else if(currentStep === 3) ok = document.getElementById('cust_phone').value.trim() !== "";
         else if(currentStep === 4) ok = document.getElementById('addr_street').value.trim() !== "" && document.getElementById('addr_city').value.trim() !== "" && document.getElementById('addr_state').value.trim() !== "";
         else if(currentStep === 5) ok = !!formData.dispose;
+        else if(currentStep === 6) ok = true; 
         else if(currentStep === 7) ok = document.getElementById('order_date').value !== "";
         else if(currentStep === 8) ok = !!formData.container;
         else if(currentStep === 9) ok = document.getElementById('order_time').value !== "";
+        else if(currentStep === 10) ok = true; 
         else if(currentStep === 11) ok = document.getElementById('order_id').files.length > 0;
         else ok = true;
 
@@ -287,12 +286,13 @@
 
     function updateUI() {
         document.getElementById('currNum').innerText = currentStep + " / 15";
-        document.getElementById('standardNav').style.display = (currentStep >= 12) ? 'none' : 'flex';
+        // Always show the nav, but hide the "Next" button on the very last step since we have the Submit button
+        document.getElementById('nextBtn').style.display = (currentStep === 15) ? 'none' : 'block';
         validate();
     }
 
     async function submitFinalOrder() {
-        alert("Finalizing order... this may take 10 seconds due to the photo size.");
+        alert("Processing order and securing photo... please wait.");
         const btn = document.getElementById('finalSubmitBtn');
         btn.innerText = "UPLOADING...";
         btn.disabled = true;
