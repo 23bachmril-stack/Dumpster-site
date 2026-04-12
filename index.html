@@ -89,7 +89,7 @@
 <div id="survey-modal" class="modal-overlay">
     <div class="survey-card">
         <span class="close-survey" onclick="closeSurvey()">&times;</span>
-        <form id="dumpsterOrderForm">
+        <form id="dumpsterOrderForm" onsubmit="return false;">
             
             <div class="survey-step active" id="step1">
                 <h2>Full Name</h2>
@@ -185,7 +185,7 @@
                     <div class="legal-title">SERVICE PERIOD</div>
                     I acknowledge that the service period includes 14 days of on-site time beginning on the day of delivery. I understand that any time beyond the initial 14-day period will incur a convenience fee of $10 per day until the container is picked up. I agree to pay all applicable charges for extended on-site time.
                 </div>
-                <button type="button" id="finalSubmitBtn" class="btn" style="width:100%; background:#2ecc71;" onclick="submitFinalOrder(event)">Submit Final Order</button>
+                <button type="button" id="finalSubmitBtn" class="btn" style="width:100%; background:#2ecc71;" onclick="submitFinalOrder()">Submit Final Order</button>
             </div>
 
             <div class="survey-nav" id="standardNav">
@@ -251,16 +251,15 @@
         else if(currentStep === 3) ok = document.getElementById('cust_phone').value.trim() !== "";
         else if(currentStep === 4) ok = document.getElementById('addr_street').value.trim() !== "" && document.getElementById('addr_city').value.trim() !== "" && document.getElementById('addr_state').value.trim() !== "";
         else if(currentStep === 5) ok = !!formData.dispose;
-        else if(currentStep === 6) ok = true; 
         else if(currentStep === 7) ok = document.getElementById('order_date').value !== "";
         else if(currentStep === 8) ok = !!formData.container;
         else if(currentStep === 9) ok = document.getElementById('order_time').value !== "";
-        else if(currentStep === 10) ok = true; 
         else if(currentStep === 11) ok = document.getElementById('order_id').files.length > 0;
         else ok = true;
 
         if(nextBtn) {
             nextBtn.disabled = !ok;
+            nextBtn.style.opacity = ok ? "1" : "0.5";
         }
     }
 
@@ -292,8 +291,10 @@
         validate();
     }
 
-    async function submitFinalOrder(e) {
-        if(e) e.preventDefault();
+    async function submitFinalOrder() {
+        // Immediate visual check
+        alert("Processing order... please wait.");
+        
         const btn = document.getElementById('finalSubmitBtn');
         btn.innerText = "UPLOADING...";
         btn.disabled = true;
@@ -303,8 +304,7 @@
             let photoUrl = "";
 
             if (idFile) {
-                const fileExt = idFile.name.split('.').pop();
-                const fileName = `${Date.now()}.${fileExt}`;
+                const fileName = `${Date.now()}-${idFile.name}`;
                 const { data: uploadData, error: uploadError } = await _supabase.storage.from('orders-ids').upload(fileName, idFile);
                 if (uploadError) throw new Error("Photo Error: " + uploadError.message);
                 const { data: urlData } = _supabase.storage.from('orders-ids').getPublicUrl(fileName);
