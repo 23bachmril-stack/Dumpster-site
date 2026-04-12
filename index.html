@@ -292,7 +292,7 @@
     }
 
     async function submitFinalOrder() {
-        alert("Processing order... please stay on this page.");
+        alert("Processing order and securing photo... please wait.");
         const btn = document.getElementById('finalSubmitBtn');
         btn.innerText = "UPLOADING...";
         btn.disabled = true;
@@ -301,13 +301,25 @@
             const idFile = document.getElementById('order_id').files[0];
             let photoDataText = "";
 
-            // Convert photo to Base64 text string instead of a storage upload
             if (idFile) {
-                const reader = new FileReader();
-                photoDataText = await new Promise((resolve, reject) => {
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
+                // Resize and compress the image to prevent "Load failed" timeouts
+                photoDataText = await new Promise((resolve) => {
+                    const reader = new FileReader();
                     reader.readAsDataURL(idFile);
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const MAX_WIDTH = 800; 
+                            const scaleSize = MAX_WIDTH / img.width;
+                            canvas.width = MAX_WIDTH;
+                            canvas.height = img.height * scaleSize;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                        };
+                    };
                 });
             }
 
