@@ -20,7 +20,7 @@
         h1, h2, h3 { font-family: 'Arial Black', Gadget, sans-serif; text-transform: uppercase; font-weight: 900; }
         .btn { display: inline-block; padding: 15px 30px; background: var(--turquoise); color: white; border: none; border-radius: 5px; text-transform: uppercase; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: 0.2s; text-align: center; }
         .btn:hover { background: #35c4b6; transform: translateY(-2px); }
-        .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; opacity: 0.5; }
 
         nav { background: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--turquoise); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .nav-left { display: flex; align-items: center; gap: 20px; }
@@ -89,7 +89,7 @@
 <div id="survey-modal" class="modal-overlay">
     <div class="survey-card">
         <span class="close-survey" onclick="closeSurvey()">&times;</span>
-        <form id="dumpsterOrderForm" onsubmit="submitFinalOrder(event)">
+        <form id="dumpsterOrderForm">
             
             <div class="survey-step active" id="step1">
                 <h2>Full Name</h2>
@@ -154,7 +154,7 @@
                 <input type="text" id="p-zip" placeholder="Billing Zip" oninput="validate()">
             </div>
 
-            <div class="survey-step" id="step11"><h2>Photo of Driver's License</h2><input type="file" id="order_id" accept="image/*" oninput="validate()"></div>
+            <div class="survey-step" id="step11"><h2>Photo of Driver's License</h2><input type="file" id="order_id" accept="image/*" onchange="validate()"></div>
 
             <div class="survey-step" id="step12">
                 <div class="legal-box">
@@ -185,7 +185,7 @@
                     <div class="legal-title">SERVICE PERIOD</div>
                     I acknowledge that the service period includes 14 days of on-site time beginning on the day of delivery. I understand that any time beyond the initial 14-day period will incur a convenience fee of $10 per day until the container is picked up. I agree to pay all applicable charges for extended on-site time.
                 </div>
-                <button type="submit" class="btn" style="width:100%; background:#2ecc71;">Submit Final Order</button>
+                <button type="button" id="finalSubmitBtn" class="btn" style="width:100%; background:#2ecc71;" onclick="submitFinalOrder(event)">Submit Final Order</button>
             </div>
 
             <div class="survey-nav" id="standardNav">
@@ -244,19 +244,24 @@
 
     function validate() {
         let ok = false;
-        const btn = document.getElementById('nextBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
         if(currentStep === 1) ok = document.getElementById('cust_first').value.trim() !== "" && document.getElementById('cust_last').value.trim() !== "";
         else if(currentStep === 2) ok = document.getElementById('cust_email').value.includes('@');
         else if(currentStep === 3) ok = document.getElementById('cust_phone').value.trim() !== "";
         else if(currentStep === 4) ok = document.getElementById('addr_street').value.trim() !== "" && document.getElementById('addr_city').value.trim() !== "" && document.getElementById('addr_state').value.trim() !== "";
         else if(currentStep === 5) ok = !!formData.dispose;
+        else if(currentStep === 6) ok = true; 
         else if(currentStep === 7) ok = document.getElementById('order_date').value !== "";
         else if(currentStep === 8) ok = !!formData.container;
+        else if(currentStep === 9) ok = document.getElementById('order_time').value !== "";
+        else if(currentStep === 10) ok = true; 
         else if(currentStep === 11) ok = document.getElementById('order_id').files.length > 0;
         else ok = true;
 
-        btn.disabled = !ok;
-        btn.style.opacity = ok ? "1" : "0.5";
+        if(nextBtn) {
+            nextBtn.disabled = !ok;
+        }
     }
 
     function highlightBubble(step, field, val) {
@@ -288,8 +293,8 @@
     }
 
     async function submitFinalOrder(e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
+        if(e) e.preventDefault();
+        const btn = document.getElementById('finalSubmitBtn');
         btn.innerText = "UPLOADING...";
         btn.disabled = true;
 
@@ -298,14 +303,14 @@
             let photoUrl = "";
 
             if (idFile) {
-                const fileName = `${Date.now()}.${idFile.name.split('.').pop()}`;
+                const fileExt = idFile.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
                 const { data: uploadData, error: uploadError } = await _supabase.storage.from('orders-ids').upload(fileName, idFile);
                 if (uploadError) throw new Error("Photo Error: " + uploadError.message);
                 const { data: urlData } = _supabase.storage.from('orders-ids').getPublicUrl(fileName);
                 photoUrl = urlData.publicUrl;
             }
 
-            // Syncing with your actual column names from the screenshot
             const finalData = {
                 customer_name: document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value,
                 email: document.getElementById('cust_email').value,
