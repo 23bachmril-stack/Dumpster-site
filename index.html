@@ -104,7 +104,10 @@
             <div class="survey-step" id="step4">
                 <h2>Delivery Address</h2>
                 <input type="text" id="addr_street" placeholder="Street Address" required oninput="validate()">
-                <input type="text" id="addr_city" placeholder="City" required oninput="validate()">
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="addr_city" placeholder="City" required oninput="validate()">
+                    <input type="text" id="addr_state" placeholder="State" required oninput="validate()">
+                </div>
                 <input type="text" id="addr_zip" placeholder="Zip Code" required oninput="validate()">
             </div>
 
@@ -217,11 +220,26 @@
     function closeSurvey() { document.getElementById('survey-modal').style.display='none'; }
 
     async function handleLogin() {
-        const { error } = await _supabase.auth.signInWithPassword({
-            email: document.getElementById('auth-email').value,
-            password: document.getElementById('auth-password').value
-        });
-        if(error) alert(error.message); else location.reload();
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+
+        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+        if (error) return alert(error.message);
+
+        // Check user role in profiles table
+        const { data: profile } = await _supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
+
+        if (profile && profile.role === 'admin') {
+            window.location.href = 'admin.html'; 
+        } else {
+            alert("Welcome back!");
+            location.reload();
+        }
     }
 
     async function handleSignUp() {
@@ -239,7 +257,7 @@
         if(currentStep === 1) ok = document.getElementById('cust_first').value.trim() !== "" && document.getElementById('cust_last').value.trim() !== "";
         else if(currentStep === 2) ok = document.getElementById('cust_email').value.includes('@');
         else if(currentStep === 3) ok = document.getElementById('cust_phone').value.trim() !== "";
-        else if(currentStep === 4) ok = document.getElementById('addr_street').value.trim() !== "";
+        else if(currentStep === 4) ok = document.getElementById('addr_street').value.trim() !== "" && document.getElementById('addr_city').value.trim() !== "" && document.getElementById('addr_state').value.trim() !== "";
         else if(currentStep === 5) ok = !!formData.dispose;
         else if(currentStep === 7) ok = document.getElementById('order_date').value !== "";
         else if(currentStep === 8) ok = !!formData.container;
@@ -291,7 +309,6 @@
             const fileExt = idFile.name.split('.').pop();
             const fileName = `${Date.now()}.${fileExt}`;
             
-            // Logic targeting your specific bucket name
             const { data: uploadData, error: uploadError } = await _supabase.storage
                 .from('orders-ids') 
                 .upload(fileName, idFile);
@@ -309,7 +326,7 @@
 
         formData.customer_name = document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value;
         formData.email = document.getElementById('cust_email').value;
-        formData.delivery_address = document.getElementById('addr_street').value;
+        formData.delivery_address = document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value + " " + document.getElementById('addr_state').value;
         formData.id_photo_url = photoUrl;
 
         const { error: dbError } = await _supabase.from('dumpster_orders').insert([formData]);
@@ -317,6 +334,7 @@
         if(dbError) {
             alert("Database Error: " + dbError.message);
             btn.disabled = false;
+            btn.innerText = "Submit Final Order";
         } else {
             alert("Success! Order submitted.");
             location.reload();
