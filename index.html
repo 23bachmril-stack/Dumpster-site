@@ -24,15 +24,19 @@
 
         nav { background: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--turquoise); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .nav-left { display: flex; align-items: center; gap: 20px; }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
         .logo-img { height: 60px; cursor: pointer; }
         .call-btn-header { background: var(--turquoise); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 900; font-size: 1rem; }
+        
+        .login-link { color: var(--turquoise); font-weight: 900; text-decoration: none; border: 2px solid var(--turquoise); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; }
+        .login-link:hover { background: var(--turquoise); color: white; }
 
         .hero { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://i.postimg.cc/MX6xvJGY/IMG-1185.jpg'); background-size: cover; background-position: center; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 0 10%; }
         .hero h1 { font-size: 3.5rem; text-shadow: 3px 3px 6px rgba(0,0,0,0.7); line-height: 1.2; max-width: 1000px; }
         .hero p { font-size: 1.4rem; font-weight: bold; margin: 20px 0 40px 0; background: rgba(0,0,0,0.6); padding: 10px 25px; border-radius: 4px; border: 2px solid var(--turquoise); }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
-        .survey-card { background: var(--white); width: 90%; max-width: 600px; border-radius: 12px; border: 3px solid var(--turquoise); padding: 40px; color: var(--dark); position: relative; }
+        .survey-card { background: var(--white); width: 90%; max-width: 600px; border-radius: 12px; border: 3px solid var(--turquoise); padding: 40px; color: var(--dark); position: relative; max-height: 90vh; overflow-y: auto; }
 
         .close-survey { position: absolute; top: 15px; right: 20px; font-size: 30px; font-weight: bold; color: #888; cursor: pointer; line-height: 1; }
         .close-survey:hover { color: var(--dark); }
@@ -67,13 +71,27 @@
         <a href="tel:2155580422" class="call-btn-header">📞 215.558.0422</a>
         <img src="https://i.postimg.cc/JnYjTMfb/IMG-1186.jpg" class="logo-img">
     </div>
+    <div class="nav-right">
+        <div id="user-display" class="login-link" onclick="openLoginModal()">Login / Sign Up</div>
+    </div>
 </nav>
 
 <section class="hero">
     <h1>Providing Modern Standards and Reliability for Waste Disposal</h1>
     <p>Serving Southeastern Pennsylvania & The Greater Philadelphia Area</p>
-    <button class="btn" onclick="openSurvey()">Order Dumpsters</button>
+    <button class="btn" id="heroOrderBtn" onclick="openSurvey()">Order Dumpsters</button>
 </section>
+
+<div id="login-modal" class="modal-overlay">
+    <div class="survey-card">
+        <span class="close-survey" onclick="closeLoginModal()">&times;</span>
+        <h2 id="login-title">Customer Login</h2>
+        <input type="email" id="auth-email" placeholder="Email Address">
+        <input type="password" id="auth-password" placeholder="Password">
+        <button class="btn" style="width:100%; margin-bottom:10px;" onclick="handleLogin()">Sign In</button>
+        <p style="text-align:center; font-weight:bold; cursor:pointer; color:var(--turquoise);" onclick="handleSignUp()">Don't have an account? Create one</p>
+    </div>
+</div>
 
 <div id="survey-modal" class="modal-overlay">
     <div class="survey-card">
@@ -211,7 +229,39 @@
 
     let currentStep = 1;
     let formData = { status: 'New Order' };
+    let currentUser = null;
 
+    // --- AUTH LOGIC ---
+    function openLoginModal() { document.getElementById('login-modal').style.display = 'flex'; }
+    function closeLoginModal() { document.getElementById('login-modal').style.display = 'none'; }
+
+    async function handleLogin() {
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) alert(error.message);
+        else { alert("Welcome back!"); location.reload(); }
+    }
+
+    async function handleSignUp() {
+        const email = document.getElementById('auth-email').value;
+        const password = document.getElementById('auth-password').value;
+        const { data, error } = await _supabase.auth.signUp({ email, password });
+        if (error) alert(error.message);
+        else alert("Account created! Check your email for confirmation.");
+    }
+
+    async function checkUser() {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (user) {
+            currentUser = user;
+            document.getElementById('user-display').innerText = `Hello, ${user.email.split('@')[0]}`;
+            document.getElementById('user-display').onclick = () => { if(confirm("Logout?")) _supabase.auth.signOut().then(()=>location.reload()); };
+        }
+    }
+    checkUser();
+
+    // --- SURVEY LOGIC ---
     function openSurvey() { document.getElementById('survey-modal').style.display='flex'; validate(); }
     function closeSurvey() { document.getElementById('survey-modal').style.display='none'; }
 
@@ -276,6 +326,7 @@
         formData.customer_name = document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value;
         formData.email = document.getElementById('cust_email').value;
         formData.delivery_address = document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value;
+        if(currentUser) formData.user_id = currentUser.id;
         
         const { error } = await _supabase.from('dumpster_orders').insert([formData]);
         if(error) {
