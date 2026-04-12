@@ -292,38 +292,23 @@
     }
 
     async function submitFinalOrder() {
-        alert("Starting secure upload... please wait.");
+        alert("Processing order... please stay on this page.");
         const btn = document.getElementById('finalSubmitBtn');
         btn.innerText = "UPLOADING...";
         btn.disabled = true;
 
         try {
             const idFile = document.getElementById('order_id').files[0];
-            let photoUrl = "";
+            let photoDataText = "";
 
+            // Convert photo to Base64 text string instead of a storage upload
             if (idFile) {
-                // Turn photo into text string (Base64) to bypass browser transfer blocks
                 const reader = new FileReader();
-                const photoData = await new Promise((resolve, reject) => {
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                photoDataText = await new Promise((resolve, reject) => {
+                    reader.onload = () => resolve(reader.result);
                     reader.onerror = reject;
                     reader.readAsDataURL(idFile);
                 });
-
-                const fileName = `${Date.now()}-${idFile.name.replace(/\s/g, '_')}`;
-                
-                // Upload as a Base64 decoded Uint8Array
-                const { data: uploadData, error: uploadError } = await _supabase.storage
-                    .from('orders-ids')
-                    .upload(fileName, Uint8Array.from(atob(photoData), c => c.charCodeAt(0)), {
-                        contentType: idFile.type,
-                        upsert: true
-                    });
-
-                if (uploadError) throw new Error("Photo Error: " + uploadError.message);
-                
-                const { data: urlData } = _supabase.storage.from('orders-ids').getPublicUrl(fileName);
-                photoUrl = urlData.publicUrl;
             }
 
             const finalData = {
@@ -336,7 +321,7 @@
                 delivery_date: document.getElementById('order_date').value,
                 delivery_time: document.getElementById('order_time').value || '',
                 instructions: document.getElementById('order_comments').value || '',
-                id_photo_url: photoUrl,
+                id_photo_url: photoDataText,
                 status: 'New Order',
                 invoice_number: '',
                 total_paid: 0
@@ -348,7 +333,7 @@
             alert("Success! Order submitted.");
             location.reload();
         } catch (err) {
-            alert("UPLOAD BLOCKED: " + err.message);
+            alert("ERROR: " + err.message);
             btn.disabled = false;
             btn.innerText = "Submit Final Order";
         }
