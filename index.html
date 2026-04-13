@@ -45,7 +45,7 @@
 </nav>
 
 <section class="hero">
-    <h1>Reliability for Waste Disposal</h1>
+    <h1>Providing Modern Standards and Reliability for Waste Disposal</h1>
     <p>Serving Southeastern Pennsylvania & The Greater Philadelphia Area</p>
     <button class="btn" onclick="openSurvey()">Order Dumpsters</button>
 </section>
@@ -66,12 +66,12 @@
         <span class="close-survey" onclick="closeSurvey()">&times;</span>
         <form id="mainOrderForm" onsubmit="return false;">
             
-            <div class="survey-step active" id="step1"><h2>First & Last Name</h2><input type="text" id="cust_first" placeholder="First Name" oninput="validate()"><input type="text" id="cust_last" placeholder="Last Name" oninput="validate()"></div>
+            <div class="survey-step active" id="step1"><h2>Full Name</h2><input type="text" id="cust_first" placeholder="First Name" oninput="validate()"><input type="text" id="cust_last" placeholder="Last Name" oninput="validate()"></div>
             <div class="survey-step" id="step2"><h2>Email Address</h2><input type="email" id="cust_email" placeholder="email@example.com" oninput="validate()"></div>
             <div class="survey-step" id="step3"><h2>Phone Number</h2><input type="tel" id="cust_phone" placeholder="215-555-5555" oninput="validate()"></div>
 
             <div class="survey-step" id="step4"><h2>Delivery Address</h2><input type="text" id="addr_street" placeholder="Street Address" oninput="validate()"><div style="display:flex; gap:10px;"><input type="text" id="addr_city" placeholder="City" oninput="validate()"><input type="text" id="addr_state" placeholder="State" oninput="validate()"></div><input type="text" id="addr_zip" placeholder="Zip Code" oninput="validate()"></div>
-            <div class="survey-step" id="step5"><h2>Waste Type</h2>
+            <div class="survey-step" id="step5"><h2>What are you disposing?</h2>
                 <div class="survey-options">
                     <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Junk')">Junk</div>
                     <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Construction Debris')">Construction Debris</div>
@@ -151,6 +151,7 @@
     
     let currentStep = 1; let orderRowId = null; let formData = { status: 'Lead' };
 
+    // USER AUTH
     async function checkUser() {
         const { data: { user } } = await _supabase.auth.getUser();
         if (user) {
@@ -159,7 +160,6 @@
         }
     }
     checkUser();
-
     function openLoginModal() { document.getElementById('login-modal').style.display='flex'; }
     function closeLoginModal() { document.getElementById('login-modal').style.display='none'; }
     async function handleLogin() {
@@ -168,20 +168,24 @@
     }
     async function handleSignUp() {
         const { error } = await _supabase.auth.signUp({ email: document.getElementById('auth-email').value, password: document.getElementById('auth-password').value });
-        if (error) alert(error.message); else alert("Check email for confirmation!");
+        if (error) alert(error.message); else alert("Account Created! Check email.");
     }
 
+    // MULTI-PULSE LOGIC (Saving in Groups)
     async function saveProgress() {
         try {
-            if(currentStep === 4 && !orderRowId) { // After Contact
-                const { data } = await _supabase.from('dumpster_orders').insert([{
+            if(currentStep === 3 && !orderRowId) {
+                // Pulse 1: Basic Info
+                const { data, error } = await _supabase.from('dumpster_orders').insert([{
                     customer_name: document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value,
                     email: document.getElementById('cust_email').value,
                     phone: document.getElementById('cust_phone').value,
-                    status: 'Contact Saved'
+                    status: 'Group 1 Saved'
                 }]).select();
                 if(data) orderRowId = data[0].id;
-            } else if(currentStep === 10 && orderRowId) { // After Dumpster Info
+                if(error) console.log("Pulse 1 Error:", error.message);
+            } else if(currentStep === 9 && orderRowId) {
+                // Pulse 2: Dumpster Info
                 await _supabase.from('dumpster_orders').update({
                     address: document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value,
                     waste_type: formData.dispose,
@@ -189,14 +193,16 @@
                     delivery_time: document.getElementById('order_time').value,
                     dumpster_size: formData.container,
                     instructions: document.getElementById('order_comments').value,
-                    status: 'Details Saved'
+                    status: 'Group 2 Saved'
                 }).eq('id', orderRowId);
-            } else if(currentStep === 11 && orderRowId) { // After Card Zip
-                await _supabase.from('dumpster_orders').update({ status: 'Payment Details Pending' }).eq('id', orderRowId);
-            } else if(currentStep === 15 && orderRowId) { // After Legal
-                await _supabase.from('dumpster_orders').update({ status: 'Legal Accepted' }).eq('id', orderRowId);
+            } else if(currentStep === 10 && orderRowId) {
+                // Pulse 3: Payment Marker
+                await _supabase.from('dumpster_orders').update({ status: 'Group 3 (Payment) Saved' }).eq('id', orderRowId);
+            } else if(currentStep === 14 && orderRowId) {
+                // Pulse 4: Legal Marker
+                await _supabase.from('dumpster_orders').update({ status: 'Group 4 (Legal) Saved' }).eq('id', orderRowId);
             }
-        } catch (e) { console.error("Auto-save failed:", e); }
+        } catch (e) { console.error("Auto-pulse failed:", e); }
     }
 
     function openSurvey() { document.getElementById('survey-modal').style.display='flex'; validate(); }
@@ -242,7 +248,7 @@
     async function submitPhoto() {
         const file = document.getElementById('order_id_upload').files[0];
         if(!file) return alert("Please select your ID photo.");
-        const btn = document.getElementById('idBtn'); btn.disabled = true; btn.innerText = "SENDING...";
+        const btn = document.getElementById('idBtn'); btn.disabled = true; btn.innerText = "SENDING ORDER...";
         
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -253,7 +259,7 @@
                 canvas.width = MAX_W; canvas.height = img.height * scale;
                 const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 const { error } = await _supabase.from('dumpster_orders').update({ id_photo_url: canvas.toDataURL('image/jpeg', 0.7), status: 'New Order' }).eq('id', orderRowId);
-                if(error) { alert(error.message); btn.disabled = false; }
+                if(error) alert(error.message); 
                 else { alert("✅ Your order has been sent!"); location.reload(); }
             };
         };
