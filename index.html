@@ -45,7 +45,7 @@
 </nav>
 
 <section class="hero">
-    <h1>Modern Standards and Reliability for Waste Disposal</h1>
+    <h1>Reliability for Waste Disposal</h1>
     <p>Serving Southeastern Pennsylvania & The Greater Philadelphia Area</p>
     <button class="btn" onclick="openSurvey()">Order Dumpsters</button>
 </section>
@@ -70,26 +70,34 @@
             <div class="survey-step" id="step2"><h2>Email Address</h2><input type="email" id="cust_email" placeholder="email@example.com" oninput="validate()"></div>
             <div class="survey-step" id="step3"><h2>Phone Number</h2><input type="tel" id="cust_phone" placeholder="215-555-5555" oninput="validate()"></div>
 
-            <div class="survey-step" id="step4"><h2>Delivery Address</h2><input type="text" id="addr_street" placeholder="Street Address" oninput="validate()"><input type="text" id="addr_city" placeholder="City" oninput="validate()"><input type="text" id="addr_state" placeholder="State" oninput="validate()"><input type="text" id="addr_zip" placeholder="Zip Code" oninput="validate()"></div>
+            <div class="survey-step" id="step4"><h2>Delivery Address</h2><input type="text" id="addr_street" placeholder="Street Address" oninput="validate()"><div style="display:flex; gap:10px;"><input type="text" id="addr_city" placeholder="City" oninput="validate()"><input type="text" id="addr_state" placeholder="State" oninput="validate()"></div><input type="text" id="addr_zip" placeholder="Zip Code" oninput="validate()"></div>
             <div class="survey-step" id="step5"><h2>Waste Type</h2>
                 <div class="survey-options">
                     <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Junk')">Junk</div>
-                    <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Construction')">Construction Debris</div>
+                    <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Construction Debris')">Construction Debris</div>
                     <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Metal')">Metal</div>
                     <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Roofing')">Roofing</div>
-                    <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Food')">Food Waste</div>
+                    <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Food Waste')">Food Waste</div>
+                    <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Dirt/Brick/Concrete')">Dirt/Brick/Concrete</div>
                 </div>
             </div>
             <div class="survey-step" id="step6"><h2>Delivery Date</h2><input type="date" id="order_date" oninput="validate()"></div>
             <div class="survey-step" id="step7"><h2>Delivery Time</h2><input type="time" id="order_time" oninput="validate()"></div>
-            <div class="survey-step" id="step8"><h2>Select Dumpster</h2>
-                <div class="survey-options">
-                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '10yd_2k')"><div>10yd<span class="docket">2000lb Limit</span></div><div class="opt-price">$495</div></div>
-                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '20yd_4k')"><div>20yd<span class="docket">4000lb Limit</span></div><div class="opt-price">$595</div></div>
-                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '30yd_5k')"><div>30yd<span class="docket">5000lb Limit</span></div><div class="opt-price">$645</div></div>
+            <div class="survey-step" id="step8">
+                <h2>Select A Dumpster</h2>
+                <div class="survey-options" style="max-height:250px; overflow-y:auto;">
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '10yd_2k')"><div>10yd<span class="docket">2000lb Weight Limit</span></div><div class="opt-price">$495</div></div>
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '10yd_conc')"><div>10yd Concrete Specialty<span class="docket">Unlimited Weight, NO TRASH</span></div><div class="opt-price">$650</div></div>
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '15yd_3k')"><div>15yd<span class="docket">3000lb Weight Limit</span></div><div class="opt-price">$545</div></div>
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '15yd_conc')"><div>15yd Concrete Specialty<span class="docket">Unlimited Weight, NO TRASH</span></div><div class="opt-price">$750</div></div>
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '20yd_4k')"><div>20yd<span class="docket">4000lb Weight Limit</span></div><div class="opt-price">$595</div></div>
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '30yd_5k')"><div>30yd<span class="docket">5000lb Weight Limit</span></div><div class="opt-price">$645</div></div>
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '40yd_6k')"><div>40yd<span class="docket">6000lb Weight Limit</span></div><div class="opt-price">$695</div></div>
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', 'compactor')"><div>Receiver Box<span class="docket">Compactor Service</span></div><div class="opt-price">$350</div></div>
                 </div>
+                <p style="font-size:0.8rem; font-weight:bold; margin-top:10px; color:#555;">All Cans have a $50.00 TFS(Temporary Fuel Surcharge as of 4/1/2026)</p>
             </div>
-            <div class="survey-step" id="step9"><h2>Delivery Notes</h2><textarea id="order_comments" placeholder="Instructions for driver..." oninput="validate()"></textarea></div>
+            <div class="survey-step" id="step9"><h2>Delivery Notes</h2><textarea id="order_comments" placeholder="Instructions..." oninput="validate()"></textarea></div>
 
             <div class="survey-step" id="step10"><h2>Payment Info</h2>
                 <input type="text" id="p-cc" placeholder="Card Number">
@@ -97,10 +105,18 @@
                 <input type="text" id="p-zip" placeholder="Billing Zip Code" oninput="validate()">
             </div>
 
-            <div class="survey-step" id="step11"><div class="legal-box"><div class="legal-title">CONTAINER DAMAGE AND THEFT RESPONSIBILITY</div>I understand that I am responsible for the care and security of the dumpster while it is on-site...</div></div>
-            <div class="survey-step" id="step12"><div class="legal-box"><div class="legal-title">SERVICE RISK</div>I acknowledge roll-off containers and trucks are extremely heavy and may cause damage...</div></div>
-            <div class="survey-step" id="step13"><div class="legal-box"><div class="legal-title">WEIGHT & PROHIBITED MATERIALS</div>I agree load exceeding weight limit incurs charges. No hazardous waste...</div></div>
-            <div class="survey-step" id="step14"><div class="legal-box"><div class="legal-title">SERVICE PERIOD</div>I acknowledge service includes 14 days. $10 per day after...</div></div>
+            <div class="survey-step" id="step11">
+                <div class="legal-box"><div class="legal-title">CONTAINER DAMAGE AND THEFT RESPONSIBILITY</div>I understand that I am responsible for the care and security of the dumpster while it is on-site. I agree to be liable for any damage to, or theft of, the container during the service period, excluding normal wear and tear. I accept responsibility for the cost of repair or replacement as determined by the company. By accepting service, I acknowledge and agree to these terms and accept full responsibility for the condition and security of the equipment while it is in my possession.</div>
+            </div>
+            <div class="survey-step" id="step12">
+                <div class="legal-box"><div class="legal-title">SERVICE RISK</div>I acknowledge that roll-off containers and delivery trucks are extremely heavy and may cause damage to driveways, pavement, underground utilities, and surrounding property. I accept full responsibility for any such damage that may occur during normal delivery, placement, service, or removal. I agree to release and hold the company harmless from any related liability or claims.</div>
+            </div>
+            <div class="survey-step" id="step13">
+                <div class="legal-box"><div class="legal-title">WEIGHT, PROHIBITED MATERIALS & ADDITIONAL FEES</div>I understand that contents placed in the dumpster are disposed of based on weight. I agree that any load exceeding the advertised weight limit will incur additional disposal charges at a rate of $0.06 per pound. I understand that certain materials are strictly prohibited and may not be placed in the dumpster, including but not limited to hazardous materials such as liquid paints, chemicals, medical waste, and batteries. I agree that additional charges will apply if the following items are placed in the dumpster: tires ($15 each), TVs/monitors ($25 each), and mattresses ($45 each). By using this service, I acknowledge that I will comply with these restrictions and accept all applicable charges.</div>
+            </div>
+            <div class="survey-step" id="step14">
+                <div class="legal-box"><div class="legal-title">SERVICE PERIOD</div>I acknowledge that the service period includes 14 days of on-site time beginning on the day of delivery. I understand that any time beyond the initial 14-day period will incur a convenience fee of $10 per day until the container is picked up. I agree to pay all applicable charges for extended on-site time.</div>
+            </div>
 
             <div class="survey-step" id="step15">
                 <div class="loading-note">
@@ -121,8 +137,8 @@
 
 <div id="photo-modal" class="modal-overlay">
     <div class="survey-card">
-        <h2 style="color:var(--turquoise)">Final Step</h2>
-        <p style="margin: 15px 0;">Upload a photo of your ID to complete your order.</p>
+        <h2 style="color:var(--turquoise)">Final Requirement</h2>
+        <p style="margin: 15px 0;">Please upload a photo of your ID to finish your order.</p>
         <input type="file" id="order_id_upload" accept="image/*" style="margin-bottom:20px;">
         <button id="idBtn" class="btn" style="width:100%;" onclick="submitPhoto()">Finish & Send Order</button>
     </div>
@@ -133,11 +149,8 @@
     const SB_KEY = 'sb_publishable_JS5YNr2g_rQJ5LGXeV8xmw_HOedqeXd';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
     
-    let currentStep = 1; 
-    let orderRowId = null;
-    let formData = { status: 'New Lead' };
+    let currentStep = 1; let orderRowId = null; let formData = { status: 'Lead' };
 
-    // AUTH FUNCTIONS
     async function checkUser() {
         const { data: { user } } = await _supabase.auth.getUser();
         if (user) {
@@ -150,9 +163,7 @@
     function openLoginModal() { document.getElementById('login-modal').style.display='flex'; }
     function closeLoginModal() { document.getElementById('login-modal').style.display='none'; }
     async function handleLogin() {
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
-        const { error } = await _supabase.auth.signInWithPassword({ email, password });
+        const { error } = await _supabase.auth.signInWithPassword({ email: document.getElementById('auth-email').value, password: document.getElementById('auth-password').value });
         if (error) alert(error.message); else location.reload();
     }
     async function handleSignUp() {
@@ -160,39 +171,36 @@
         if (error) alert(error.message); else alert("Check email for confirmation!");
     }
 
-    // MULTI-PULSE LOGIC
+    async function saveProgress() {
+        try {
+            if(currentStep === 4 && !orderRowId) { // After Contact
+                const { data } = await _supabase.from('dumpster_orders').insert([{
+                    customer_name: document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value,
+                    email: document.getElementById('cust_email').value,
+                    phone: document.getElementById('cust_phone').value,
+                    status: 'Contact Saved'
+                }]).select();
+                if(data) orderRowId = data[0].id;
+            } else if(currentStep === 10 && orderRowId) { // After Dumpster Info
+                await _supabase.from('dumpster_orders').update({
+                    address: document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value,
+                    waste_type: formData.dispose,
+                    delivery_date: document.getElementById('order_date').value,
+                    delivery_time: document.getElementById('order_time').value,
+                    dumpster_size: formData.container,
+                    instructions: document.getElementById('order_comments').value,
+                    status: 'Details Saved'
+                }).eq('id', orderRowId);
+            } else if(currentStep === 11 && orderRowId) { // After Card Zip
+                await _supabase.from('dumpster_orders').update({ status: 'Payment Details Pending' }).eq('id', orderRowId);
+            } else if(currentStep === 15 && orderRowId) { // After Legal
+                await _supabase.from('dumpster_orders').update({ status: 'Legal Accepted' }).eq('id', orderRowId);
+            }
+        } catch (e) { console.error("Auto-save failed:", e); }
+    }
+
     function openSurvey() { document.getElementById('survey-modal').style.display='flex'; validate(); }
     function closeSurvey() { document.getElementById('survey-modal').style.display='none'; }
-
-    async function saveProgress() {
-        if(currentStep === 3 && !orderRowId) {
-            // Pulse 1
-            const { data } = await _supabase.from('dumpster_orders').insert([{
-                customer_name: document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value,
-                email: document.getElementById('cust_email').value,
-                phone: document.getElementById('cust_phone').value,
-                status: 'Contact Saved'
-            }]).select();
-            if(data) orderRowId = data[0].id;
-        } else if(currentStep === 9 && orderRowId) {
-            // Pulse 2
-            await _supabase.from('dumpster_orders').update({
-                address: document.getElementById('addr_street').value + ", " + document.getElementById('addr_city').value,
-                waste_type: formData.dispose,
-                delivery_date: document.getElementById('order_date').value,
-                delivery_time: document.getElementById('order_time').value,
-                dumpster_size: formData.container,
-                instructions: document.getElementById('order_comments').value,
-                status: 'Details Documented'
-            }).eq('id', orderRowId);
-        } else if(currentStep === 10 && orderRowId) {
-            // Pulse 3
-            await _supabase.from('dumpster_orders').update({ status: 'Payment Zip Captured' }).eq('id', orderRowId);
-        } else if(currentStep === 14 && orderRowId) {
-            // Pulse 4
-            await _supabase.from('dumpster_orders').update({ status: 'Legal Accepted - Awaiting ID' }).eq('id', orderRowId);
-        }
-    }
 
     function validate() {
         let ok = false; const nextBtn = document.getElementById('nextBtn');
@@ -233,15 +241,21 @@
 
     async function submitPhoto() {
         const file = document.getElementById('order_id_upload').files[0];
-        if(!file) return alert("Please select a photo of your ID.");
-        const btn = document.getElementById('idBtn'); btn.disabled = true; btn.innerText = "SENDING ORDER...";
+        if(!file) return alert("Please select your ID photo.");
+        const btn = document.getElementById('idBtn'); btn.disabled = true; btn.innerText = "SENDING...";
         
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async (e) => {
-            const { error } = await _supabase.from('dumpster_orders').update({ id_photo_url: e.target.result, status: 'New Order' }).eq('id', orderRowId);
-            if(error) alert(error.message); 
-            else { alert("✅ Your order has been sent!"); location.reload(); }
+            const img = new Image(); img.src = e.target.result;
+            img.onload = async () => {
+                const canvas = document.createElement('canvas'); const MAX_W = 800; const scale = MAX_W / img.width;
+                canvas.width = MAX_W; canvas.height = img.height * scale;
+                const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const { error } = await _supabase.from('dumpster_orders').update({ id_photo_url: canvas.toDataURL('image/jpeg', 0.7), status: 'New Order' }).eq('id', orderRowId);
+                if(error) { alert(error.message); btn.disabled = false; }
+                else { alert("✅ Your order has been sent!"); location.reload(); }
+            };
         };
     }
 </script>
