@@ -57,7 +57,7 @@
         <input type="email" id="auth-email" placeholder="Email Address">
         <input type="password" id="auth-password" placeholder="Password">
         <button class="btn" style="width:100%; margin-bottom:10px;" onclick="handleLogin()">Sign In</button>
-        <p style="text-align:center; font-weight:bold; cursor:pointer; color:var(--turquoise);" onclick="handleSignUp()">Create Account</p>
+        <p style="text-align:center; font-weight:bold; cursor:pointer; color:var(--turquoise);" onclick="handleSignUp()">Create New Account</p>
     </div>
 </div>
 
@@ -83,6 +83,7 @@
             </div>
             <div class="survey-step" id="step6"><h2>Delivery Date</h2><input type="date" id="order_date" oninput="validate()"></div>
             <div class="survey-step" id="step7"><h2>Delivery Time</h2><input type="time" id="order_time" oninput="validate()"></div>
+            
             <div class="survey-step" id="step8">
                 <h2>Select A Dumpster</h2>
                 <div class="survey-options" style="max-height:250px; overflow-y:auto;">
@@ -97,6 +98,7 @@
                 </div>
                 <p style="font-size:0.8rem; font-weight:bold; margin-top:10px; color:#555;">All Cans have a $50.00 TFS (Temporary Fuel Surcharge as of 4/1/2026)</p>
             </div>
+            
             <div class="survey-step" id="step9"><h2>Delivery Notes</h2><textarea id="order_comments" placeholder="Instructions..." oninput="validate()"></textarea></div>
 
             <div class="survey-step" id="step10"><h2>Payment Info</h2>
@@ -105,13 +107,24 @@
                 <input type="text" id="p-zip" placeholder="Billing Zip Code" oninput="validate()">
             </div>
 
-            <div class="survey-step" id="step11"><div class="legal-box"><div class="legal-title">CONTAINER DAMAGE AND THEFT RESPONSIBILITY</div>I understand that I am responsible for the care and security of the dumpster while it is on-site. I agree to be liable for any damage to, or theft of, the container during the service period, excluding normal wear and tear. I accept responsibility for the cost of repair or replacement as determined by the company. By accepting service, I acknowledge and agree to these terms and accept full responsibility for the condition and security of the equipment while it is in my possession.</div></div>
-            <div class="survey-step" id="step12"><div class="legal-box"><div class="legal-title">SERVICE RISK</div>I acknowledge that roll-off containers and delivery trucks are extremely heavy and may cause damage to driveways, pavement, underground utilities, and surrounding property. I accept full responsibility for any such damage that may occur during normal delivery, placement, service, or removal. I agree to release and hold the company harmless from any related liability or claims.</div></div>
-            <div class="survey-step" id="step13"><div class="legal-box"><div class="legal-title">WEIGHT, PROHIBITED MATERIALS & ADDITIONAL FEES</div>I understand that contents placed in the dumpster are disposed of based on weight. I agree that any load exceeding the advertised weight limit will incur additional disposal charges at a rate of $0.06 per pound. I understand that certain materials are strictly prohibited and may not be placed in the dumpster, including liquid paints, chemicals, medical waste, and batteries. I agree that additional charges will apply if the following items are placed in the dumpster: tires ($15 each), TVs/monitors ($25 each), and mattresses ($45 each).</div></div>
-            <div class="survey-step" id="step14"><div class="legal-box"><div class="legal-title">SERVICE PERIOD</div>I acknowledge that the service period includes 14 days of on-site time beginning on the day of delivery. I understand that any time beyond the initial 14-day period will incur a convenience fee of $10 per day until the container is picked up.</div></div>
+            <div class="survey-step" id="step11">
+                <div class="legal-box"><div class="legal-title">CONTAINER DAMAGE AND THEFT RESPONSIBILITY</div>I understand that I am responsible for the care and security of the dumpster while it is on-site. I agree to be liable for any damage to, or theft of, the container during the service period, excluding normal wear and tear. I accept responsibility for the cost of repair or replacement as determined by the company. By accepting service, I acknowledge and agree to these terms and accept full responsibility for the condition and security of the equipment while it is in my possession.</div>
+            </div>
+            <div class="survey-step" id="step12">
+                <div class="legal-box"><div class="legal-title">SERVICE RISK</div>I acknowledge that roll-off containers and delivery trucks are extremely heavy and may cause damage to driveways, pavement, underground utilities, and surrounding property. I accept full responsibility for any such damage that may occur during normal delivery, placement, service, or removal. I agree to release and hold the company harmless from any related liability or claims.</div>
+            </div>
+            <div class="survey-step" id="step13">
+                <div class="legal-box"><div class="legal-title">WEIGHT, PROHIBITED MATERIALS & ADDITIONAL FEES</div>I understand that contents placed in the dumpster are disposed of based on weight. I agree that any load exceeding the advertised weight limit will incur additional disposal charges at a rate of $0.06 per pound. I understand that certain materials are strictly prohibited and may not be placed in the dumpster, including liquid paints, chemicals, medical waste, and batteries. I agree that additional charges will apply if the following items are placed in the dumpster: tires ($15 each), TVs/monitors ($25 each), and mattresses ($45 each).</div>
+            </div>
+            <div class="survey-step" id="step14">
+                <div class="legal-box"><div class="legal-title">SERVICE PERIOD</div>I acknowledge that the service period includes 14 days of on-site time beginning on the day of delivery. I understand that any time beyond the initial 14-day period will incur a convenience fee of $10 per day until the container is picked up. I agree to pay all applicable charges for extended on-site time.</div>
+            </div>
 
             <div class="survey-step" id="step15">
-                <div class="loading-note"><b>DATA SECURED</b><br><br>Last Step: Upload your ID on the next screen to finalize the order.</div>
+                <div class="loading-note">
+                    <b>INFORMATION DOCUMENTED!</b><br><br>
+                    To finalize and send your order, you must upload a photo of your Driver's License ID on the next screen.
+                </div>
                 <button type="button" class="btn" style="width:100%; margin-top:20px; background:#2ecc71;" onclick="openPhotoModal()">Proceed to ID Upload</button>
             </div>
 
@@ -126,8 +139,8 @@
 
 <div id="photo-modal" class="modal-overlay">
     <div class="survey-card">
-        <h2 style="color:var(--turquoise)">Final Step: Photo ID</h2>
-        <p style="margin: 15px 0;">Please select or take a photo of your Driver's License.</p>
+        <h2 style="color:var(--turquoise)">Photo ID Upload</h2>
+        <p style="margin: 15px 0;">Please take or select a photo of your ID.</p>
         <input type="file" id="order_id_upload" accept="image/*" style="margin-bottom:20px; display:block; width:100%;">
         <button id="idBtn" class="btn" style="width:100%;" onclick="submitPhoto()">Finish & Send Order</button>
     </div>
@@ -138,14 +151,16 @@
     const SB_KEY = 'sb_publishable_JS5YNr2g_rQJ5LGXeV8xmw_HOedqeXd';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
     
-    let currentStep = 1; let orderRowId = null; let formData = { status: 'New Lead' };
-    let selectedFile = null;
+    let currentStep = 1; 
+    let orderRowId = null; 
+    let formData = { status: 'Lead' };
+    let tempFile = null;
 
-    // Listener for ID photo - Fixes the "Select ID" error
+    // Listen for file selection immediately to prevent loss on iPad
     document.addEventListener('change', function(e) {
         if (e.target && e.target.id === 'order_id_upload') {
-            selectedFile = e.target.files[0];
-            console.log("File captured:", selectedFile.name);
+            tempFile = e.target.files[0];
+            console.log("File captured:", tempFile ? tempFile.name : "None");
         }
     });
 
@@ -154,6 +169,7 @@
         if (user) document.getElementById('user-display').innerText = `Logout (${user.email.split('@')[0]})`;
     }
     checkUser();
+
     function openLoginModal() { document.getElementById('login-modal').style.display='flex'; }
     function closeLoginModal() { document.getElementById('login-modal').style.display='none'; }
     async function handleLogin() {
@@ -165,14 +181,14 @@
         if (error) alert(error.message); else alert("Check email!");
     }
 
-    async function savePulse() {
+    async function saveProgress() {
         try {
             if(currentStep === 3 && !orderRowId) {
                 const { data } = await _supabase.from('dumpster_orders').insert([{
                     customer_name: document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value,
                     email: document.getElementById('cust_email').value,
                     phone: document.getElementById('cust_phone').value,
-                    status: 'Contact Saved'
+                    status: 'Pulse 1 OK'
                 }]).select();
                 if(data) orderRowId = data[0].id;
             } else if(currentStep === 9 && orderRowId) {
@@ -183,44 +199,69 @@
                     delivery_time: document.getElementById('order_time').value,
                     dumpster_size: formData.container,
                     instructions: document.getElementById('order_comments').value,
-                    status: 'Details Updated'
+                    status: 'Pulse 2 OK'
                 }).eq('id', orderRowId);
             }
-        } catch (e) { console.warn(e); }
+        } catch (e) { console.warn("Pulse failed, will retry."); }
     }
 
     function openSurvey() { document.getElementById('survey-modal').style.display='flex'; validate(); }
     function closeSurvey() { document.getElementById('survey-modal').style.display='none'; }
-    function validate() { 
+
+    function validate() {
         let ok = false; const nextBtn = document.getElementById('nextBtn');
         if(currentStep === 1) ok = document.getElementById('cust_first').value.trim() !== "";
         else if(currentStep === 3) ok = document.getElementById('cust_phone').value.trim() !== "";
+        else if(currentStep === 4) ok = document.getElementById('addr_street').value.trim() !== "";
+        else if(currentStep === 6) ok = document.getElementById('order_date').value !== "";
+        else if(currentStep === 7) ok = document.getElementById('order_time').value !== "";
+        else if(currentStep === 8) ok = !!formData.container;
         else if(currentStep === 10) ok = document.getElementById('p-zip').value.length > 4;
         else ok = true;
         nextBtn.disabled = !ok; nextBtn.style.opacity = ok ? "1" : "0.5";
     }
+
     function highlightBubble(step, field, val) { formData[field] = val; document.querySelectorAll(`.s${step}-opt`).forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); validate(); }
-    async function nextStep() { await savePulse(); document.getElementById(`step${currentStep}`).classList.remove('active'); currentStep++; document.getElementById(`step${currentStep}`).classList.add('active'); updateUI(); }
-    function prevStep() { if(currentStep === 1) return; document.getElementById(`step${currentStep}`).classList.remove('active'); currentStep--; document.getElementById(`step${currentStep}`).classList.add('active'); updateUI(); }
-    function updateUI() { document.getElementById('currNum').innerText = currentStep + " / 15"; document.getElementById('standardNav').style.display = (currentStep === 15) ? 'none' : 'flex'; validate(); }
-    function openPhotoModal() { document.getElementById('survey-modal').style.display='none'; document.getElementById('photo-modal').style.display='flex'; }
+    
+    async function nextStep() {
+        await saveProgress();
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        currentStep++;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+        updateUI();
+    }
+    function prevStep() {
+        if(currentStep === 1) return;
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        currentStep--;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+        updateUI();
+    }
+    function updateUI() {
+        document.getElementById('currNum').innerText = currentStep + " / 15";
+        document.getElementById('standardNav').style.display = (currentStep === 15) ? 'none' : 'flex';
+        validate();
+    }
+
+    function openPhotoModal() { 
+        if(!orderRowId) { alert("Session error. Please restart the form."); location.reload(); return; }
+        document.getElementById('survey-modal').style.display='none'; 
+        document.getElementById('photo-modal').style.display='flex'; 
+    }
 
     async function submitPhoto() {
-        if(!selectedFile) { alert("Please select a file first."); return; }
-        if(!orderRowId) { alert("Session error. Please restart."); return; }
-
-        const btn = document.getElementById('idBtn'); 
-        btn.disabled = true; btn.innerText = "UPLOADING...";
-
+        if(!tempFile) { alert("Please select your ID photo first."); return; }
+        const btn = document.getElementById('idBtn'); btn.disabled = true; btn.innerText = "SENDING...";
+        
         const filePath = `ids/${orderRowId}.jpg`;
-        const { error: uploadError } = await _supabase.storage.from('orders-ids').upload(filePath, selectedFile);
+        const { error: uploadError } = await _supabase.storage.from('orders-ids').upload(filePath, tempFile);
 
         if(uploadError) {
-            alert("Upload failed. Error: " + uploadError.message);
+            alert("Upload Error: " + uploadError.message);
             btn.disabled = false; btn.innerText = "Finish & Send Order";
         } else {
             await _supabase.from('dumpster_orders').update({ id_photo_url: filePath, status: 'New Order' }).eq('id', orderRowId);
-            alert("✅ Order Sent Successfully!");
+            alert("✅ Your order has been sent!");
             location.reload();
         }
     }
