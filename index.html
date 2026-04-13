@@ -12,21 +12,21 @@
         h1, h2, h3 { font-family: 'Arial Black', Gadget, sans-serif; text-transform: uppercase; font-weight: 900; }
         .btn { display: inline-block; padding: 15px 30px; background: var(--turquoise); color: white; border: none; border-radius: 5px; text-transform: uppercase; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: 0.2s; text-align: center; }
         .btn:hover { background: #35c4b6; transform: translateY(-2px); }
-        .btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.5; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.7; }
         nav { background: var(--white); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--turquoise); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .logo-img { height: 60px; cursor: pointer; }
         .login-link { color: var(--turquoise); font-weight: 900; border: 2px solid var(--turquoise); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; }
         .hero { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://i.postimg.cc/MX6xvJGY/IMG-1185.jpg'); background-size: cover; background-position: center; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 0 10%; }
         .hero h1 { font-size: 3.5rem; text-shadow: 3px 3px 6px rgba(0,0,0,0.7); line-height: 1.2; max-width: 1000px; }
-        .hero p { font-size: 1.4rem; font-weight: bold; margin: 20px 0 40px 0; background: rgba(0,0,0,0.6); padding: 10px 25px; border-radius: 4px; border: 2px solid var(--turquoise); }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
         .survey-card { background: var(--white); width: 90%; max-width: 600px; border-radius: 12px; border: 3px solid var(--turquoise); padding: 40px; color: var(--dark); position: relative; max-height: 90vh; overflow-y: auto; }
         .close-survey { position: absolute; top: 15px; right: 20px; font-size: 30px; font-weight: bold; color: #888; cursor: pointer; }
         .survey-step { display: none; }
         .survey-step.active { display: block; }
-        input, textarea { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid var(--border); border-radius: 6px; font-weight: bold; }
-        .survey-opt { background: #eee; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; border: 2px solid transparent; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .survey-opt.active { background: var(--turquoise); color: white; }
+        input, textarea { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid var(--border); border-radius: 6px; font-weight: bold; font-size: 1rem; }
+        .survey-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .survey-opt { background: #eee; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; border: 2px solid transparent; display: flex; justify-content: space-between; align-items: center; }
+        .survey-opt.active { background: var(--turquoise); color: white; border-color: var(--dark); }
         .opt-price { font-weight: 900; font-size: 1.1rem; }
         .docket { font-size: 0.85rem; display: block; margin-top: 5px; color: #333; font-weight: 900; }
         .survey-opt.active .docket { color: white; }
@@ -40,18 +40,18 @@
 <nav>
     <div class="nav-left"><a href="tel:2155580422" style="background: var(--turquoise); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 900;">📞 215.558.0422</a></div>
     <img src="https://i.postimg.cc/JnYjTMfb/IMG-1186.jpg" class="logo-img" onclick="location.reload()">
-    <div class="nav-right"><div class="login-link" onclick="openLoginModal()">Login</div></div>
+    <div class="nav-right"><div class="login-link" onclick="openLoginModal()">Login / Sign Up</div></div>
 </nav>
 
 <section class="hero">
-    <h1>Reliable Waste Disposal Standards</h1>
+    <h1>Modern Standards and Reliability for Waste Disposal</h1>
     <button class="btn" onclick="openSurvey()">Order Dumpsters</button>
 </section>
 
 <div id="login-modal" class="modal-overlay">
     <div class="survey-card">
         <span class="close-survey" onclick="closeLoginModal()">&times;</span>
-        <h2>Login</h2>
+        <h2>Employee Access</h2>
         <input type="email" id="auth-email" placeholder="Email"><input type="password" id="auth-password" placeholder="Password">
         <button class="btn" style="width:100%;" onclick="handleLogin()">Sign In</button>
     </div>
@@ -67,6 +67,7 @@
             <div class="survey-step" id="step3"><h2>Phone</h2><input type="tel" id="cust_phone" placeholder="215-555-5555"></div>
 
             <div class="survey-step" id="step4"><h2>Address</h2><input type="text" id="addr_street" placeholder="Street"><div style="display:flex; gap:10px;"><input type="text" id="addr_city" placeholder="City"><input type="text" id="addr_state" placeholder="State"></div><input type="text" id="addr_zip" placeholder="Zip"></div>
+            
             <div class="survey-step" id="step5"><h2>Waste Type</h2>
                 <div class="survey-options">
                     <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Junk')">Junk</div>
@@ -77,8 +78,10 @@
                     <div class="survey-opt s5-opt" onclick="highlightBubble(5, 'dispose', 'Dirt/Brick/Concrete')">Dirt/Brick/Concrete</div>
                 </div>
             </div>
-            <div class="survey-step" id="step6"><h2>Delivery Date</h2><input type="date" id="order_date"></div>
-            <div class="survey-step" id="step7"><h2>Delivery Time</h2><input type="time" id="order_time"></div>
+
+            <div class="survey-step" id="step6"><h2>Date</h2><input type="date" id="order_date"></div>
+            <div class="survey-step" id="step7"><h2>Time</h2><input type="time" id="order_time"></div>
+            
             <div class="survey-step" id="step8">
                 <h2>Select Dumpster</h2>
                 <div class="survey-options" style="max-height:200px; overflow-y:auto;">
@@ -89,29 +92,31 @@
                     <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '20yd_4k')"><div>20yd<span class="docket">4000lb Limit</span></div><div class="opt-price">$595</div></div>
                     <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '30yd_5k')"><div>30yd<span class="docket">5000lb Limit</span></div><div class="opt-price">$645</div></div>
                     <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', '40yd_6k')"><div>40yd<span class="docket">6000lb Limit</span></div><div class="opt-price">$695</div></div>
+                    <div class="survey-opt s8-opt" onclick="highlightBubble(8, 'container', 'compactor')"><div>Receiver Box<span class="docket">Compactor Service</span></div><div class="opt-price">$350</div></div>
                 </div>
-                <p style="font-size:0.8rem; font-weight:bold;">$50.00 Fuel Surcharge Applicable (4/1/2026)</p>
+                <p style="font-size:0.8rem; font-weight:bold; color:#555; margin-top:10px;">All Cans have a $50.00 TFS (Temporary Fuel Surcharge as of 4/1/2026)</p>
             </div>
+
             <div class="survey-step" id="step9"><h2>Notes</h2><textarea id="order_comments" placeholder="Instructions..."></textarea></div>
 
             <div class="survey-step" id="step10"><h2>Payment</h2><input type="text" id="p-cc" placeholder="Card Number"><div style="display:flex; gap:10px;"><input type="text" id="p-exp" placeholder="MM/YY"><input type="text" id="p-cvv" placeholder="CVV"></div><input type="text" id="p-zip" placeholder="Billing Zip"></div>
 
             <div class="survey-step" id="step11"><div class="legal-box"><div class="legal-title">CONTAINER DAMAGE AND THEFT RESPONSIBILITY</div>I understand that I am responsible for the care and security of the dumpster while it is on-site. I agree to be liable for any damage to, or theft of, the container during the service period, excluding normal wear and tear. I accept responsibility for the cost of repair or replacement as determined by the company...</div></div>
-            <div class="survey-step" id="step12"><div class="legal-box"><div class="legal-title">SERVICE RISK</div>I acknowledge that roll-off containers and delivery trucks are extremely heavy and may cause damage to driveways, pavement, underground utilities, and surrounding property. I accept full responsibility for any such damage...</div></div>
-            <div class="survey-step" id="step13"><div class="legal-box"><div class="legal-title">WEIGHT, PROHIBITED MATERIALS & ADDITIONAL FEES</div>I understand contents are disposed of based on weight. Overages charged at $0.06 per pound. Hazardous materials are strictly prohibited. Additional charges for tires ($15), TVs ($25), and mattresses ($45).</div></div>
-            <div class="survey-step" id="step14"><div class="legal-box"><div class="legal-title">SERVICE PERIOD</div>I acknowledge service includes 14 days. Any time beyond the initial period will incur a convenience fee of $10 per day until the container is picked up.</div></div>
+            <div class="survey-step" id="step12"><div class="legal-box"><div class="legal-title">SERVICE RISK</div>I acknowledge that roll-off containers and delivery trucks are extremely heavy and may cause damage to driveways, pavement, underground utilities, and surrounding property...</div></div>
+            <div class="survey-step" id="step13"><div class="legal-box"><div class="legal-title">WEIGHT, PROHIBITED MATERIALS & ADDITIONAL FEES</div>I understand contents are disposed based on weight. Overages charged at $0.06 per lb. Hazardous materials are prohibited. Tires ($15), TVs ($25), and mattresses ($45) incur extra fees...</div></div>
+            <div class="survey-step" id="step14"><div class="legal-box"><div class="legal-title">SERVICE PERIOD</div>I acknowledge service includes 14 days. Any time beyond the initial period will incur a convenience fee of $10 per day until picked up.</div></div>
 
             <div class="survey-step" id="step15">
                 <div style="text-align:center; padding:20px; border:2px dashed var(--turquoise); background:#f0ffff;">
-                    <b>READY TO FINALIZE!</b><br><br>Last Step: Upload your ID on the next screen.
+                    <b>READY TO FINALIZE</b><br><br>Last Step: Upload your ID on the next screen.
                 </div>
-                <button type="button" class="btn" style="width:100%; margin-top:20px; background:#2ecc71;" onclick="goToPhoto()">Proceed to ID Upload</button>
+                <button type="button" class="btn" style="width:100%; margin-top:20px; background:#2ecc71;" onclick="openPhoto()">Proceed to ID Upload</button>
             </div>
 
             <div class="survey-nav" id="standardNav">
-                <button type="button" onclick="prevStep()">← BACK</button>
-                <div id="currNum">1 / 15</div>
-                <button type="button" class="btn" id="nextBtn" onclick="nextStep()">NEXT →</button>
+                <button type="button" class="btn" onclick="prevStep()" style="background:#888;">BACK</button>
+                <div id="currNum" style="font-weight:900;">1 / 15</div>
+                <button type="button" class="btn" id="nextBtn" onclick="nextStep()">NEXT</button>
             </div>
         </form>
     </div>
@@ -121,8 +126,9 @@
     <div class="survey-card">
         <span class="close-survey" onclick="location.reload()">&times;</span>
         <h2>ID Upload</h2>
+        <p style="margin: 15px 0;">Select or take a photo of your Driver's License.</p>
         <input type="file" id="order_id_upload" accept="image/*" style="margin-bottom:20px;">
-        <button id="idBtn" class="btn" style="width:100%;" onclick="submitSecureFinal()">Finish Order</button>
+        <button id="idBtn" class="btn" style="width:100%;" onclick="submitFinalOrder()">Finish & Send Order</button>
     </div>
 </div>
 
@@ -131,53 +137,86 @@
     const SB_KEY = 'sb_publishable_JS5YNr2g_rQJ5LGXeV8xmw_HOedqeXd';
     const _supabase = supabase.createClient(SB_URL, SB_KEY);
     
-    let currentStep = 1; let formData = {};
+    let currentStep = 1; 
+    let orderRowId = null; 
+    let formData = {};
+
+    function openSurvey() { document.getElementById('survey-modal').style.display='flex'; }
+    function closeSurvey() { document.getElementById('survey-modal').style.display='none'; }
+    function openLoginModal() { document.getElementById('login-modal').style.display='flex'; }
+    function closeLoginModal() { document.getElementById('login-modal').style.display='none'; }
+    function highlightBubble(s, f, v) { formData[f] = v; document.querySelectorAll(`.s${s}-opt`).forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); }
 
     async function handleLogin() {
         const { error } = await _supabase.auth.signInWithPassword({ email: document.getElementById('auth-email').value, password: document.getElementById('auth-password').value });
         if (error) alert(error.message); else location.reload();
     }
 
-    async function nextStep() {
-        if(currentStep === 1) localStorage.setItem('cust_name', document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value);
-        
-        // Pulse save to keep ID anchored in hardware storage
-        if(currentStep === 3) {
-            const { data } = await _supabase.from('dumpster_orders').insert([{ customer_name: localStorage.getItem('cust_name'), status: 'Draft' }]).select();
-            if(data) localStorage.setItem('active_id', data[0].id);
-        }
-        if(currentStep === 9) {
-            const rid = localStorage.getItem('active_id');
-            await _supabase.from('dumpster_orders').update({ address: document.getElementById('addr_street').value, dumpster_size: formData.container }).eq('id', rid);
-        }
+    async function saveProgress() {
+        if(!orderRowId) orderRowId = localStorage.getItem('recovery_id');
+        try {
+            if(currentStep === 3 && !orderRowId) {
+                const name = document.getElementById('cust_first').value + " " + document.getElementById('cust_last').value;
+                const { data } = await _supabase.from('dumpster_orders').insert([{ customer_name: name, status: 'Draft' }]).select();
+                if(data) { orderRowId = data[0].id; localStorage.setItem('recovery_id', orderRowId); }
+            } else if(currentStep === 9 && orderRowId) {
+                await _supabase.from('dumpster_orders').update({
+                    address: document.getElementById('addr_street').value,
+                    dumpster_size: formData.container || '',
+                    waste_type: formData.dispose || ''
+                }).eq('id', orderRowId);
+            }
+        } catch (e) { console.warn("Saving..."); }
+    }
 
+    async function nextStep() {
+        await saveProgress();
         document.getElementById(`step${currentStep}`).classList.remove('active');
         currentStep++;
         document.getElementById(`step${currentStep}`).classList.add('active');
         updateUI();
     }
 
-    function prevStep() { if(currentStep === 1) return; document.getElementById(`step${currentStep}`).classList.remove('active'); currentStep--; document.getElementById(`step${currentStep}`).classList.add('active'); updateUI(); }
-    function updateUI() { document.getElementById('currNum').innerText = currentStep + " / 15"; document.getElementById('standardNav').style.display = (currentStep === 15) ? 'none' : 'flex'; }
-    function goToPhoto() { document.getElementById('survey-modal').style.display='none'; document.getElementById('photo-modal').style.display='flex'; }
-    function highlightBubble(s, f, v) { formData[f] = v; document.querySelectorAll(`.s${s}-opt`).forEach(el => el.classList.remove('active')); event.currentTarget.classList.add('active'); }
+    function prevStep() {
+        if(currentStep === 1) return;
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        currentStep--;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+        updateUI();
+    }
 
-    async function submitSecureFinal() {
+    function updateUI() {
+        document.getElementById('currNum').innerText = currentStep + " / 15";
+        document.getElementById('standardNav').style.display = (currentStep === 15) ? 'none' : 'flex';
+    }
+
+    function openPhoto() {
+        document.getElementById('survey-modal').style.display='none';
+        document.getElementById('photo-modal').style.display='flex';
+    }
+
+    async function submitFinalOrder() {
         const file = document.getElementById('order_id_upload').files[0];
-        const rid = localStorage.getItem('active_id');
+        const rid = orderRowId || localStorage.getItem('recovery_id');
         
-        if(!rid) { alert("ID Link Lost. Page refreshed. Please restart."); location.reload(); return; }
-        if(!file) { alert("Please pick a file."); return; }
+        if(!file) return alert("Select a photo.");
+        if(!rid) return alert("Session error. Please refresh and restart.");
 
-        const btn = document.getElementById('idBtn'); btn.disabled = true; btn.innerText = "UPLOADING...";
+        const btn = document.getElementById('idBtn');
+        btn.disabled = true; btn.innerText = "SENDING...";
+
         const path = `ids/${rid}.jpg`;
-        
         const { error: uploadError } = await _supabase.storage.from('orders-ids').upload(path, file);
-        if(uploadError) { alert("Upload Failed: " + uploadError.message); btn.disabled = false; return; }
 
-        await _supabase.from('dumpster_orders').update({ id_photo_url: path, status: 'New Order' }).eq('id', rid);
-        localStorage.clear();
-        alert("✅ Order Successful!"); location.reload();
+        if(uploadError) {
+            alert("Upload failed. Try again.");
+            btn.disabled = false;
+        } else {
+            await _supabase.from('dumpster_orders').update({ id_photo_url: path, status: 'New Order' }).eq('id', rid);
+            localStorage.clear();
+            alert("✅ ORDER SENT!");
+            location.reload();
+        }
     }
 </script>
 </body>
